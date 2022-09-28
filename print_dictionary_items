@@ -1,0 +1,13 @@
+my_dict = {'A': 'alpha', 'B': 'bravo','C': 'charlie','D': 'delta','E': 'echo','F': 'foxtrot','G': 'golf'}
+
+def print_keyvalue():
+  for key, value in my_dict.items():
+    print(key, ":", value)
+
+def print_key():
+   for key in my_dict:
+        print(key)
+
+def print_value():
+   for value in my_dict.values():
+        print(value)
