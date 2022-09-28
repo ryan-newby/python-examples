@@ -13,4 +13,4 @@ def search(elm,low,high, myArray):
             low = mid + 1
 
     return "elm not found"
-search(12, 0, 6, myArray)
+print(search(12, 0, 6, myArray))
