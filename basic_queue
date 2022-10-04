@@ -13,9 +13,14 @@ def enqueue(element_in):
 
 # Dequeue
 def dequeue():
-   print("dequeuing item: " + str(queue[0]) + "\n")
-   queue.pop(0)
-   print(queue)
+  if len(queue) > 0:
+     print("dequeuing item: " + str(queue[0]) + "\n")
+     queue.pop(0)
+     # A return statement could be used in order to pass the dequeued item to another function
+     # Here we are only demostrating the dequeue function through print statements
+     print(queue)
+  else:
+    print("Queue is already empty, cannot dequeue.")
 
 enqueue('f')
 dequeue()
