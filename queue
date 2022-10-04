@@ -1,0 +1,19 @@
+# Start queue
+queue = [1,2,3,4]
+
+# Enqueue
+def enqueue(element_in):
+   print("\nenqueuing item: " + str(element_in))
+   queue.append(element_in)
+   print("\ncurrent queue: ")
+   print(queue)
+   print("\n")
+
+# Dequeue
+def dequeue():
+   print("dequeuing item: " + str(queue[0]) + "\n")
+   queue.pop(0)
+   print(queue)
+
+enqueue('f')
+dequeue()
