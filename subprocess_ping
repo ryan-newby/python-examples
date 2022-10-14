@@ -1,0 +1,13 @@
+import subprocess
+
+hosts = ['127.0.0.1', '8.8.8.8', '192.168.86.1', '8.8.4.4']
+
+def ping():
+    for i in hosts:
+        sp_ping = subprocess.run(['ping', '-c', '3', i], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        if sp_ping.returncode == 0:
+            print("host " + i, "is up")
+        else:
+            print("host " + i, "is down")
+
+ping()
