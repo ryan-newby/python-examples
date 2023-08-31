@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+
+# Unsupervised Learning Algorithm
+
+# Ryan Newby
+# 09/03/23
+# CS379 Machine Learning
+# Using the provided data set that represents the Titanic disaster, 
+# utilize a unsupervised clustering algorithm to describe the data 
+
+# Provided data set: https://resources.careered.com/LCMSFileSharePreview/Resources/MSExcelWorkbook/CS379T-Week-1-IP.xls
+
+# "In unsupervised machine learning, we use a learning algorithm to discover unknown patterns in unlabeled datasets."
+# "Unlabled does not refer to the names assigned to columns"
+
+# References
+# Cukierski, W. (2012). Titanic - machine learning from disaster. Titanic - Machine Learning from Disaster | Kaggle. https://www.kaggle.com/c/titanic/data 
+# Mbaabu, O. (2020, November 18). Clustering in unsupervised machine learning. Clustering in Unsupervised Machine Learning. https://www.section.io/engineering-education/clustering-in-unsupervised-ml/ 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import LabelEncoder
+
+# Load Excel file
+data = pd.read_excel("CS379T-Week-1-IP.xls")
+
+# Drop body identifier and name columns because we feel these are irrelevant
+data= data.drop('body', axis=1)
+data= data.drop('name', axis=1)
+
+# Replace NaN/missing values with 0 to prevent computation errors
+# An alternate to setting NaN values to zero could be using mean values instead
+data.fillna(0,inplace=True)
+
+# Transform the 'sex' column values to 1 for 'male' and 0 for 'female'
+# Because I want this to be clear in the cluster statistics
+data['sex'] = data['sex'].map({'male': 1, 'female': 0})
+
+# Same for embarked, but unlikely needed
+data['embarked'] = data['embarked'].map({'S': 0, 'C': 1, 'Q': 2})
+
+# Defining categorical data (non-numeric) column names as an array/list
+categorical_columns = ['ticket', 'fare', 'cabin', 'embarked', 'boat', 'home.dest']
+
+# Defining already numeric column names as an array/list
+numeric_columns = ['pclass', 'survived', 'age', 'sibsp', 'parch']
+
+# Convert categorical data to numerical data so it can be graphed
+# Because how can you possibly graph a string?
+label_encoder = LabelEncoder()
+for column in categorical_columns:
+    data[column] = label_encoder.fit_transform(data[column].astype(str))
+
+# Leaving this here for debugging
+#print(data)
+
+# Scale the data to prevent biased results from unstandardized data,
+# Has something to do with statistical formulas
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(data)
+
+# kmeans method
+# While not performing labeling for survival, we are setting the cluster number to '2'
+n_clusters = 2
+kmeans = KMeans(n_clusters=n_clusters, random_state=0)
+cluster_labels = kmeans.fit_predict(scaled_data)
+
+# Add cluster labels to the data
+data['Cluster'] = cluster_labels
+
+# This function calculates the mean value of data in each column within the Pandas dataframe
+cluster_stats = data.groupby('Cluster').mean()
+
+print('\n')
+print('Cluster Statistics: ', '\n')
+# Print cluster statistics
+print(cluster_stats)
+print('\n')
+
+print("Key: ", '\n')
+print("-Passenger Classes 1-3")
+print("-Survived 0 = not survived, Survived 1 = Survived")
+print("-Sex 0 = female, Sex 1 = male")
+print("-sibsp is # of siblings/spouses")
+print("-sibsp is # of parents/children")
+print("-embarked is Port of Embarkation: C = Cherbourg, Q = Queenstown, S = Southampton")
+print("-Boat 0 is placeholder for NaN values")
+print('\n')
