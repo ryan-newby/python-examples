@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+
+# Supervised Learning Algorithm
+
+# Ryan Newby
+# 09/03/23
+# CS379 Machine Learning
+# Using the provided data set that represents the Titanic disaster, 
+# utilize a simple supervised classification prediction to determine who might survive
+
+# Provided data set: https://resources.careered.com/LCMSFileSharePreview/Resources/MSExcelWorkbook/CS379T-Week-1-IP.xls
+
+# References
+# GeeksforGeeks. (2022, June 29). How to split the dataset with scikit-learn’s train_test_split() function. How to split the dataset with scikit-learn’s train_test_split() function | GeeksforGeeks. https://www.geeksforgeeks.org/how-to-split-the-dataset-with-scikit-learns-train_test_split-function/ 
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+from sklearn.metrics import classification_report
+import seaborn as sns
+
+# Load Excel file
+data = pd.read_excel("CS379T-Week-1-IP.xls")
+
+# Drop body identifier and name columns because we feel these are irrelevant
+data= data.drop('body', axis=1)
+data= data.drop('name', axis=1)
+
+# Replace NaN/missing values with 0 to prevent computation errors
+# An alternate to setting NaN values to zero could be using mean values instead
+data.fillna(0,inplace=True)
+
+# Transform the 'sex' column values to 1 for 'male' and 0 for 'female'
+# Because I want this to be clear in the cluster statistics
+# Luckily there are no Nan values for sex in the datasheet
+data['sex'] = data['sex'].map({'male': 1, 'female': 0})
+
+# Same for embarked, but unlikely needed
+data['embarked'] = data['embarked'].map({'S': 0, 'C': 1, 'Q': 2})
+
+# Defining categorical data (non-numeric) column names as an array/list
+categorical_columns = ['ticket', 'fare', 'cabin', 'embarked', 'boat', 'home.dest']
+
+# Convert categorical data to numerical data so it can be graphed
+# Because how can you possibly graph a string?
+label_encoder = LabelEncoder()
+for column in categorical_columns:
+    data[column] = label_encoder.fit_transform(data[column].astype(str))
+
+# Just checking the numbers of survivors vs number of fatalities
+#survived = data['survived'].value_counts()
+#print("\n", "Survival Sums :", "\n", "0 = did not survive, 1= survived", "\n", survived)
+#print("\n")
+
+# Select relevant features(x) and labels(y)
+# Leaving out some columns as they may be irrelevant and/or highly categorical in nature
+# Such as body ID and name
+X = data[['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked', 'boat']]
+Y = data['survived'].values
+
+
+# Split the data into training and testing sets
+# Train data is used to create the model while test data is used check accuracy of the model
+# test_size=0.2 means 20% of data will be used for testing accuracy.
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
+
+# Initializing and using StandardScaler library to normalize data
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+# Initializing LogisticRegression library and using training data as the input parameters.
+model = LogisticRegression()
+model.fit(X_train, Y_train)
+
+# Finding predicted values by using values of non-surival columns of test data
+# Test data could be replaced with new (non-test) data to make predictions
+y_pred = model.predict(X_test)
+
+# Calculate accuracy of those predictions
+print("\n", "Accuracy: ",metrics.accuracy_score(Y_test, y_pred), "\n")
+
+# Evaluates performance of classification model using industry standartd terms/metrics
+print("Classification Report:", "\n")
+print(classification_report(Y_test, y_pred))
+
+print("### Visually comparing predictions ###", "\n")
+print("Survival Predictions:", "\n")
+print(y_pred, "\n")
+print("Actual Survival from test data:", "\n")
+print(Y_test, "\n")
